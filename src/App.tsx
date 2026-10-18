@@ -6,6 +6,7 @@ import { ProtectedRoute } from './features/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
 import { DashboardPage } from './pages/DashboardPage';
 import { LeadsPage } from './pages/LeadsPage';
+import { LeadDetailPage } from './features/leads/LeadDetailPage';
 import { FollowupsPage } from './pages/FollowupsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -41,6 +42,7 @@ export const App: React.FC = () => {
           >
             <Route index element={<DashboardPage />} />
             <Route path="leads" element={<LeadsPage />} />
+            <Route path="leads/:id" element={<LeadDetailPage />} />
             <Route path="followups" element={<FollowupsPage />} />
             <Route path="reports" element={<ReportsPage />} />
             <Route path="settings" element={<SettingsPage />} />
