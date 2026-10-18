@@ -59,7 +59,13 @@ export const LoginPage: React.FC = () => {
       const res = await signIn(email, password);
       setLoading(false);
       if (!res.success) {
-        setError(res.error || 'Invalid credentials or connection issue.');
+        if (res.error?.toLowerCase().includes('email not confirmed')) {
+          setError(
+            'Email not confirmed yet by Supabase. Please check your inbox for the confirmation link, OR in Supabase Dashboard → Authentication → Users, click the "..." menu next to your email and select "Confirm user".'
+          );
+        } else {
+          setError(res.error || 'Invalid credentials or connection issue.');
+        }
       } else {
         navigate(from, { replace: true });
       }
