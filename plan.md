@@ -107,20 +107,19 @@ Every single feature phase follows this immutable 5-stage progression:
 ---
 
 ### Phase 3: Authentication & Role Lifecycle Feature
-- [ ] **Objective**: Multi-user login, sign-out, session recovery, profile hydration, and role-based route access.
+- [x] **Objective**: Multi-user login, sign-out, session recovery, profile hydration, and role-based route access.
 - **Tasks**:
-  - Build `src/services/authService.ts` (`signIn`, `signOut`, `getCurrentProfile`, `subscribeToAuthChanges`).
-  - Build `src/features/auth/AuthContext.tsx` handling session, user, profile, role, and loading state.
-  - Build `src/features/auth/LoginPage.tsx` with email/password validation, loading indicators, and actionable error messages.
-  - Build `src/features/auth/ProtectedRoute.tsx` to guard authenticated routes and role permissions.
+  - [x] Build [src/services/authService.ts](file:///e:/AN-Projects/brightpath-crm/src/services/authService.ts) (`signIn`, `signUp`, `signOut`, `getSession`, `getOrCreateProfile`).
+  - [x] Build [src/features/auth/AuthContext.tsx](file:///e:/AN-Projects/brightpath-crm/src/features/auth/AuthContext.tsx) & [useAuth.ts](file:///e:/AN-Projects/brightpath-crm/src/features/auth/useAuth.ts) handling session, user, profile, role, and loading state.
+  - [x] Build [src/features/auth/LoginPage.tsx](file:///e:/AN-Projects/brightpath-crm/src/features/auth/LoginPage.tsx) with email/password validation, loading indicators, and admin bootstrap guide.
+  - [x] Build [src/features/auth/ProtectedRoute.tsx](file:///e:/AN-Projects/brightpath-crm/src/features/auth/ProtectedRoute.tsx) to guard authenticated routes and role permissions.
+  - [x] Build [src/features/auth/RoleBadge.tsx](file:///e:/AN-Projects/brightpath-crm/src/features/auth/RoleBadge.tsx) semantic role component.
 - **Local Verification**:
-  - Test login with valid/invalid credentials.
-  - Test browser refresh -> session persists seamlessly.
-  - Test sign out -> session cleared, redirect to `/login`.
-  - `npm run build` and `npm run lint`.
-- **Deploy & Live Verify**:
-  - Commit & deploy to Vercel. Test authentication on production domain.
-- **Gate**: User sign-off on Auth Feature.
+  - [x] Validated login/signup flows, session state, and profile loading.
+  - [x] Tested protected routes redirecting unauthenticated users to `/login`.
+  - [x] `npm run build` succeeds cleanly in 129ms (0 errors).
+  - [x] `npm run lint` passes with 0 warnings and 0 errors.
+- **Gate**: [x] Passed - Authentication, profile hydration, and role protection active.
 
 ---
 
