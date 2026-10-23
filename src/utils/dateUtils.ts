@@ -103,6 +103,30 @@ export function getRelativeTimeDescription(dueAt: string, status: FollowupStatus
 }
 
 /**
+ * Calculates human-readable relative time for past activity events
+ * Example: "Just now", "5m ago", "2h ago", "Yesterday", "3d ago"
+ */
+export function getEventRelativeTime(isoString: string): string {
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return '';
+    const diffMs = Date.now() - d.getTime();
+    const diffMins = Math.round(diffMs / (1000 * 60));
+    const diffHours = Math.round(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return formatDateTime(isoString);
+  } catch {
+    return '';
+  }
+}
+
+/**
  * Convert Date to HTML datetime-local input string (YYYY-MM-DDTHH:mm)
  */
 export function toDatetimeLocalInputString(date: Date): string {

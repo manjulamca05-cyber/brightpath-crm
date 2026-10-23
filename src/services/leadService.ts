@@ -203,10 +203,13 @@ export const leadService = {
   },
 
   /**
-   * Update lead contact, notes, or assignment
+   * Update lead contact, notes, or assignment & log audit activity
    */
   async updateLead(id: string, updates: Partial<Lead>): Promise<{ success: boolean; error?: string }> {
     try {
+      const { data: authData } = await supabase.auth.getUser();
+      const currentUserId = authData.user?.id || null;
+
       const { error } = await supabase
         .from('leads')
         .update(updates)
@@ -214,6 +217,28 @@ export const leadService = {
 
       if (error) {
         return { success: false, error: error.message };
+      }
+
+      // Log notes update activity
+      if (updates.notes !== undefined) {
+        await supabase.from('activities').insert({
+          lead_id: id,
+          actor_id: currentUserId,
+          activity_type: 'notes_updated',
+          description: updates.notes ? 'Counselor notes updated' : 'Counselor notes cleared',
+          metadata: { preview: updates.notes ? updates.notes.slice(0, 120) : null },
+        });
+      }
+
+      // Log assignment update activity
+      if (updates.assigned_to !== undefined) {
+        await supabase.from('activities').insert({
+          lead_id: id,
+          actor_id: currentUserId,
+          activity_type: 'assignment_changed',
+          description: updates.assigned_to ? 'Lead assigned to counselor' : 'Lead unassigned',
+          metadata: { assigned_to: updates.assigned_to },
+        });
       }
 
       return { success: true };

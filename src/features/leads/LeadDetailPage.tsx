@@ -5,6 +5,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { StatusModal } from './StatusModal';
 import { ScheduleFollowupModal } from '../followups/ScheduleFollowupModal';
+import { ActivityTimeline } from './ActivityTimeline';
 import { leadService } from '../../services/leadService';
 import { followupService } from '../../services/followupService';
 import type { Lead, LeadStatus, FollowUp } from '../../types/database';
@@ -102,6 +103,7 @@ export const LeadDetailPage: React.FC = () => {
 
     if (res.success) {
       setNotesFeedback('Notes saved successfully!');
+      setRefreshTrigger((prev) => prev + 1);
       setTimeout(() => setNotesFeedback(null), 3000);
     } else {
       setNotesFeedback('Failed to save notes.');
@@ -476,6 +478,13 @@ export const LeadDetailPage: React.FC = () => {
           </div>
         )}
       </Card>
+
+      {/* Activity Timeline Section */}
+      <ActivityTimeline
+        leadId={lead.id}
+        refreshTrigger={refreshTrigger}
+        onActivityAdded={() => setRefreshTrigger((prev) => prev + 1)}
+      />
 
       {/* Status Modal */}
       <StatusModal
