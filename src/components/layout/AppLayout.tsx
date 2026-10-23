@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { MobileNav } from './MobileNav';
+import { NetworkStatusBanner } from '../common/NetworkStatusBanner';
 
 export const AppLayout: React.FC = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -38,6 +39,7 @@ export const AppLayout: React.FC = () => {
 
       {/* Right Content Area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        <NetworkStatusBanner />
         <Header
           onMenuClick={() => setMobileNavOpen(true)}
           title={title}

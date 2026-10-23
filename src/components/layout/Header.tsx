@@ -43,14 +43,16 @@ export const Header: React.FC<HeaderProps> = ({
             border: 'none',
             color: 'var(--text-muted)',
             cursor: 'pointer',
-            padding: '6px',
+            padding: '10px',
+            minWidth: '44px',
+            minHeight: '44px',
             borderRadius: 'var(--radius-sm)',
             display: 'none',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Menu size={22} />
+          <Menu size={22} aria-hidden="true" />
         </button>
 
         {/* Title & Breadcrumb */}

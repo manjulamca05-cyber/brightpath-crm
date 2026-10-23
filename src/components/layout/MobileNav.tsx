@@ -98,11 +98,16 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
               border: 'none',
               color: 'var(--text-muted)',
               cursor: 'pointer',
-              padding: '4px',
+              padding: '10px',
+              minWidth: '44px',
+              minHeight: '44px',
               borderRadius: 'var(--radius-sm)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
@@ -119,6 +124,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
                 alignItems: 'center',
                 gap: '12px',
                 padding: '12px 14px',
+                minHeight: '44px',
                 borderRadius: 'var(--radius-md)',
                 color: isActive ? '#ffffff' : 'var(--text-muted)',
                 backgroundColor: isActive ? 'var(--primary-light)' : 'transparent',
@@ -154,13 +160,15 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
 
           <button
             onClick={() => { onClose(); signOut(); }}
+            aria-label="Sign out of account"
             style={{
               width: '100%',
+              minHeight: '44px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              padding: '8px',
+              padding: '10px 16px',
               borderRadius: 'var(--radius-sm)',
               border: '1px solid rgba(239, 68, 68, 0.25)',
               background: 'rgba(239, 68, 68, 0.1)',
@@ -170,7 +178,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ isOpen, onClose }) => {
               cursor: 'pointer',
             }}
           >
-            <LogOut size={16} />
+            <LogOut size={16} aria-hidden="true" />
             <span>Sign Out</span>
           </button>
         </div>

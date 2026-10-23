@@ -42,8 +42,10 @@ export const Select: React.FC<SelectProps> = ({
       <select
         id={selectId}
         disabled={disabled}
+        aria-invalid={!!error}
         style={{
           width: '100%',
+          minHeight: '44px',
           padding: '10px 14px',
           background: 'var(--bg-input)',
           border: `1px solid ${error ? '#ef4444' : 'var(--border-default)'}`,

@@ -93,7 +93,9 @@ export const Modal: React.FC<ModalProps> = ({
               border: 'none',
               color: 'var(--text-muted)',
               cursor: 'pointer',
-              padding: '4px',
+              padding: '10px',
+              minWidth: '44px',
+              minHeight: '44px',
               borderRadius: 'var(--radius-sm)',
               display: 'flex',
               alignItems: 'center',
@@ -102,7 +104,7 @@ export const Modal: React.FC<ModalProps> = ({
             onMouseOver={(e) => (e.currentTarget.style.color = 'var(--text-main)')}
             onMouseOut={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 

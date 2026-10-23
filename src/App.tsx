@@ -11,6 +11,7 @@ import { FollowupsPage } from './pages/FollowupsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { isSupabaseConfigured } from './lib/supabaseClient';
 import { ConfigMissingBanner } from './components/common/ConfigMissingBanner';
 import './App.css';
@@ -25,9 +26,10 @@ export const App: React.FC = () => {
   }
 
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
           {/* Public Authentication Route */}
           <Route path="/login" element={<LoginPage />} />
 
@@ -54,6 +56,7 @@ export const App: React.FC = () => {
         </Routes>
       </AuthProvider>
     </BrowserRouter>
+  </ErrorBoundary>
   );
 };
 

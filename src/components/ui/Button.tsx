@@ -57,12 +57,12 @@ export const Button: React.FC<ButtonProps> = ({
   const getSizeStyles = (): React.CSSProperties => {
     switch (size) {
       case 'sm':
-        return { padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)' };
+        return { padding: '6px 12px', fontSize: '0.8rem', minHeight: '36px', borderRadius: 'var(--radius-sm)' };
       case 'lg':
-        return { padding: '12px 24px', fontSize: '1rem', borderRadius: 'var(--radius-md)' };
+        return { padding: '12px 24px', fontSize: '1rem', minHeight: '48px', borderRadius: 'var(--radius-md)' };
       case 'md':
       default:
-        return { padding: '8px 16px', fontSize: '0.875rem', borderRadius: 'var(--radius-md)' };
+        return { padding: '8px 16px', fontSize: '0.875rem', minHeight: '44px', borderRadius: 'var(--radius-md)' };
     }
   };
 
