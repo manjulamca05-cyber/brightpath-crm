@@ -7,9 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "test": "node --experimental-strip-types tests/phase7.test.mjs",
+    "test": "node --experimental-strip-types tests/phase8.test.mjs",
     "test:phase6": "node --experimental-strip-types tests/phase6.test.mjs",
     "test:phase7": "node --experimental-strip-types tests/phase7.test.mjs",
+    "test:phase8": "node tests/phase8.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
