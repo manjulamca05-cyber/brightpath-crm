@@ -4,9 +4,27 @@ import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { StatusModal } from './StatusModal';
+import { ScheduleFollowupModal } from '../followups/ScheduleFollowupModal';
 import { leadService } from '../../services/leadService';
-import type { Lead, LeadStatus } from '../../types/database';
-import { ArrowLeft, Phone, Mail, BookOpen, Clock, AlertTriangle, Save } from 'lucide-react';
+import { followupService } from '../../services/followupService';
+import type { Lead, LeadStatus, FollowUp } from '../../types/database';
+import {
+  isFollowupOverdue,
+  formatDateTime,
+  getRelativeTimeDescription,
+} from '../../utils/dateUtils';
+import {
+  ArrowLeft,
+  Phone,
+  Mail,
+  BookOpen,
+  Clock,
+  AlertTriangle,
+  Save,
+  CalendarPlus,
+  CheckCircle2,
+  CalendarCheck,
+} from 'lucide-react';
 
 export const LeadDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +34,11 @@ export const LeadDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Follow-ups state
+  const [followups, setFollowups] = useState<FollowUp[]>([]);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [completingId, setCompletingId] = useState<string | null>(null);
 
   // Status transition modal
   const [statusModalOpen, setStatusModalOpen] = useState(false);
@@ -30,13 +53,19 @@ export const LeadDetailPage: React.FC = () => {
     let ignore = false;
     if (!id) return;
 
-    leadService.getLeadById(id).then((res) => {
+    Promise.all([
+      leadService.getLeadById(id),
+      followupService.getFollowups({ leadId: id }),
+    ]).then(([leadRes, fuRes]) => {
       if (!ignore) {
-        if (res.error || !res.data) {
-          setError(res.error || 'Student inquiry not found');
+        if (leadRes.error || !leadRes.data) {
+          setError(leadRes.error || 'Student inquiry not found');
         } else {
-          setLead(res.data);
-          setNotes(res.data.notes || '');
+          setLead(leadRes.data);
+          setNotes(leadRes.data.notes || '');
+        }
+        if (fuRes.data) {
+          setFollowups(fuRes.data);
         }
         setLoading(false);
       }
@@ -46,6 +75,18 @@ export const LeadDetailPage: React.FC = () => {
       ignore = true;
     };
   }, [id, refreshTrigger]);
+
+  const handleCompleteFollowup = async (fuId: string) => {
+    setCompletingId(fuId);
+    try {
+      const res = await followupService.completeFollowup(fuId);
+      if (res.success) {
+        setRefreshTrigger((prev) => prev + 1);
+      }
+    } finally {
+      setCompletingId(null);
+    }
+  };
 
   const handleOpenStatusModal = (status: LeadStatus) => {
     setTargetStatus(status);
@@ -286,6 +327,156 @@ export const LeadDetailPage: React.FC = () => {
         </Card>
       </div>
 
+      {/* Scheduled Follow-ups Section */}
+      <Card>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '16px',
+            flexWrap: 'wrap',
+            gap: '12px',
+          }}
+        >
+          <div>
+            <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: 'var(--text-main)' }}>
+              Scheduled Follow-ups
+            </h3>
+            <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              Callbacks, reminders, and consultation sessions for this student
+            </p>
+          </div>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setScheduleModalOpen(true)}
+            icon={<CalendarPlus size={14} />}
+          >
+            Schedule Follow-up
+          </Button>
+        </div>
+
+        {followups.length === 0 ? (
+          <div
+            style={{
+              padding: '32px 16px',
+              textAlign: 'center',
+              backgroundColor: 'var(--bg-canvas)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px dashed var(--border-default)',
+            }}
+          >
+            <CalendarCheck size={28} style={{ color: 'var(--text-subtle)', marginBottom: '8px' }} />
+            <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+              No follow-ups currently scheduled for this student.
+            </p>
+            <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: 'var(--text-subtle)' }}>
+              Schedule a reminder to ensure steady admissions communication.
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {followups.map((fu) => {
+              const overdue = isFollowupOverdue(fu.due_at, fu.status);
+              const relText = getRelativeTimeDescription(fu.due_at, fu.status);
+
+              return (
+                <div
+                  key={fu.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px 14px',
+                    borderRadius: 'var(--radius-md)',
+                    border: `1px solid ${overdue ? 'rgba(239, 68, 68, 0.3)' : 'var(--border-subtle)'}`,
+                    backgroundColor: overdue ? 'rgba(239, 68, 68, 0.05)' : 'var(--bg-canvas)',
+                    flexWrap: 'wrap',
+                    gap: '10px',
+                  }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: '220px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      {overdue && (
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            padding: '2px 8px',
+                            borderRadius: 'var(--radius-full)',
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            color: '#f87171',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          <AlertTriangle size={11} /> {relText}
+                        </span>
+                      )}
+                      {!overdue && fu.status === 'pending' && (
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            fontWeight: 600,
+                            padding: '2px 8px',
+                            borderRadius: 'var(--radius-full)',
+                            backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                            color: 'var(--accent)',
+                          }}
+                        >
+                          {relText}
+                        </span>
+                      )}
+                      {fu.status === 'completed' && (
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            fontWeight: 600,
+                            padding: '2px 8px',
+                            borderRadius: 'var(--radius-full)',
+                            backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                            color: '#34d399',
+                          }}
+                        >
+                          Completed
+                        </span>
+                      )}
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        {formatDateTime(fu.due_at)}
+                      </span>
+                    </div>
+
+                    <div style={{ fontSize: '0.875rem', color: 'var(--text-main)' }}>
+                      {fu.note}
+                    </div>
+                  </div>
+
+                  {/* Complete button */}
+                  {fu.status === 'pending' && (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      loading={completingId === fu.id}
+                      onClick={() => handleCompleteFollowup(fu.id)}
+                      icon={<CheckCircle2 size={13} />}
+                      style={{
+                        backgroundColor: '#059669',
+                        borderColor: '#10b981',
+                      }}
+                    >
+                      Complete
+                    </Button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Card>
+
       {/* Status Modal */}
       <StatusModal
         isOpen={statusModalOpen}
@@ -294,6 +485,17 @@ export const LeadDetailPage: React.FC = () => {
         targetStatus={targetStatus}
         onSuccess={() => {
           setLoading(true);
+          setRefreshTrigger((prev) => prev + 1);
+        }}
+      />
+
+      {/* Schedule Followup Modal */}
+      <ScheduleFollowupModal
+        isOpen={scheduleModalOpen}
+        onClose={() => setScheduleModalOpen(false)}
+        preselectedLeadId={lead.id}
+        preselectedLeadName={lead.full_name}
+        onSuccess={() => {
           setRefreshTrigger((prev) => prev + 1);
         }}
       />

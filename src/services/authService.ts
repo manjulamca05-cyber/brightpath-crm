@@ -153,6 +153,25 @@ export const authService = {
   },
 
   /**
+   * Fetch all staff profiles accessible by the current user (for assignments)
+   */
+  async getStaffProfiles(): Promise<Profile[]> {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('full_name', { ascending: true });
+
+      if (error || !data) {
+        return [];
+      }
+      return data as Profile[];
+    } catch {
+      return [];
+    }
+  },
+
+  /**
    * Subscribe to auth state transitions (SIGN_IN, SIGN_OUT, TOKEN_REFRESHED)
    */
   onAuthStateChange(callback: (session: Session | null, user: User | null) => void) {
